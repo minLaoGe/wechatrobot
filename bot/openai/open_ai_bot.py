@@ -1,9 +1,10 @@
 # encoding:utf-8
-
+import json
 import time
 
 import openai
 import openai.error
+import requests
 
 from bot.bot import Bot
 from bot.openai.open_ai_image import OpenAIImage
@@ -83,16 +84,45 @@ class OpenAIBot(Bot, OpenAIImage):
 
     def reply_text(self, session: OpenAISession, retry_count=0):
         try:
-            response = openai.Completion.create(prompt=str(session), **self.args)
-            res_content = response.choices[0]["text"].strip().replace("<|endoftext|>", "")
-            total_tokens = response["usage"]["total_tokens"]
-            completion_tokens = response["usage"]["completion_tokens"]
-            logger.info("[OPEN_AI] reply={}".format(res_content))
-            return {
-                "total_tokens": total_tokens,
-                "completion_tokens": completion_tokens,
-                "content": res_content,
-            }
+            # 回复
+            logger.info("[OPEN_AI] session={}".format(str(session)))
+            start_time = time.time()  # 获取当前时间
+            # response = openai.ChatCompletion.create(api_key=api_key, messages=session.messages, **args)
+            isOpenAI = conf().get("is_openAI")
+
+            if conf().get("distribute_url") and not isOpenAI:
+                clientId =conf().get("client_id")
+                data=self.args
+                data['messages']=session.messages
+                headers = {
+                    'Content-Type': 'application/json',
+                    'client-id': clientId,
+                    'people-desuka': 'robots'
+                    # 如果还有其他的headers，你可以在这里添加
+                }
+                logger.info("开始请求ChatGPT了")
+                # 发送POST请求
+                distributeUrl= conf().get("distribute_url") +'/openAI/v1/chat/completions';
+
+                response = requests.post(distributeUrl, headers=headers, data=json.dumps(data),timeout=600)
+                res = json.loads(response.text)
+                response=res['data']
+                return {
+                    "total_tokens": response["usage"]["total_tokens"],
+                    "completion_tokens": response["usage"]["completion_tokens"],
+                    "content": response['choices'][0]["message"]["content"],
+                }
+            else:
+                response = openai.Completion.create(prompt=str(session), **self.args)
+                res_content = response.choices[0]["text"].strip().replace("<|endoftext|>", "")
+                total_tokens = response["usage"]["total_tokens"]
+                completion_tokens = response["usage"]["completion_tokens"]
+                logger.info("[OPEN_AI] reply={}".format(res_content))
+                return {
+                    "total_tokens": total_tokens,
+                    "completion_tokens": completion_tokens,
+                    "content": res_content,
+                }
         except Exception as e:
             need_retry = retry_count < 2
             result = {"completion_tokens": 0, "content": "我现在有点累了，等会再来吧"}

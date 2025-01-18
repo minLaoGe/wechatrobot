@@ -3,13 +3,15 @@
   "dify_api_key": "app-xxx",
   "dify_app_type": "chatbot",
   "channel_type": "gewechat",
+  "client_id": "",
+  "distribute_url": "https://liuyuncopilot.com/gateway/distribute",
   "gewechat_app_id": "",
   "gewechat_token": "",
   "gewechat_base_url": "",
   "gewechat_callback_url": "",
   "gewechat_download_url": "",
   "debug": true,
-  "model": "dify",
+  "model": "gpt-3.5-turbo",
   "single_chat_prefix": [""],
   "single_chat_reply_prefix": "",
   "group_chat_prefix": ["@bot"],
@@ -18,5 +20,6 @@
   "speech_recognition": true,
   "voice_reply_voice": true,
   "voice_to_text": "dify",
-  "text_to_voice": "dify"
+  "text_to_voice": "dify",
+  "character_desc": "你是ChatGPT, 一个由OpenAI训练的大型语言模型, 你旨在回答并解决人们的任何问题，并且可以使用多种语言与人交流。"
 }
