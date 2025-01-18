@@ -104,7 +104,7 @@ class OpenAIBot(Bot, OpenAIImage):
                 # 发送POST请求
                 distributeUrl= conf().get("distribute_url") +'/openAI/v1/chat/completions';
 
-                response = requests.post(distributeUrl, headers=headers, data=json.dumps(data),timeout=600)
+                response = requests.post(distributeUrl, headers=headers, data=json.dumps(data),timeout=600,verify=False)
                 res = json.loads(response.text)
                 response=res['data']
                 return {
