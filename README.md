@@ -88,19 +88,54 @@ dify-on-wechat、dify、gewechat服务的调用关系
 
 #### 部署gewechat服务
 
-```bash
-# 从阿里云镜像仓库拉取(国内)
-docker pull registry.cn-chengdu.aliyuncs.com/tu1h/wechotd:alpine
-docker tag registry.cn-chengdu.aliyuncs.com/tu1h/wechotd:alpine gewe
-
-# 创建数据目录并启动服务
-mkdir -p gewechat/data  
-docker run -itd -v ./gewechat/data:/root/temp -p 2531:2531 -p 2532:2532 --restart=always --name=gewe gewe
-```
-
 #### 配置dify-on-wechat
 
-gewechat相关配置如下，注意**channel_type设置为gewechat**
+
+1. clone下来代码
+
+机器人仓库访问地址https://e.coding.net/liuyunstudio/chatbot_system/wechatbotnew.git
+
+2. 切换分支到 MyBranch
+
+> git checkout MyBranch
+
+3. 复制配置文件
+
+> cp config-template.json  config.json
+
+<div align="center">
+<img width="700" src="./docs/gewechat/cppic.png">
+</div>
+
+
+4. 把ip加入数据库白名单
+
+登录宝塔平台，可以查看数据库账号密码和数据端口
+
+<div align="center">
+<img width="700" src="./docs/gewechat/baota1.png">
+</div>
+
+<div align="center">
+<img width="700" src="./docs/gewechat/baota2.png">
+</div>
+
+5. 登录数据库
+打开clinet_config表格随便复制一行数据，修改3列
+client_id
+client_ip
+id
+
+<div align="center">
+<img width="700" src="./docs/gewechat/database1.png">
+</div>
+
+<div align="center">
+<img width="700" src="./docs/gewechat/database2.png">
+</div>
+
+
+6. 修改配置文件, gewechat相关配置如下，以下配置都是必填，注意**channel_type设置为gewechat**
 
 ```bash 
 {
@@ -109,7 +144,8 @@ gewechat相关配置如下，注意**channel_type设置为gewechat**
     "gewechat_app_id": "",       # 首次登录可留空,自动获取
     "gewechat_base_url": "http://本机ip:2531/v2/api",  # gewechat服务API地址
     "gewechat_callback_url": "http://本机ip:9919/v2/api/callback/collect", # 回调地址
-    "gewechat_download_url": "http://本机ip:2532/download" # 文件下载地址
+    "gewechat_download_url": "http://本机ip:2532/download", # 文件下载地址
+    "client_id": "UUID" #填写步骤5上面的client_id
 }
 ```
 
